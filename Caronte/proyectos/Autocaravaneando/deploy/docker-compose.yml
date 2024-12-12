@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  api:
+    image: base/ubuntu
+    container_name: autocaravaneando-api
+    build:
+      context: ../../..
+      dockerfile: dockerfile/ubuntu/Dockerfile
+    volumes:
+      - ../../datos:/var/datos
+      - ../../logs:/var/logs
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - GITHUB=${GITHUB}
+    command: >
+      bash -c "cd /usr/local/bin/admin &&
+               ./ssh.sh &&
+               ./usuarios.sh &&
+               ./start.sh"
+
+  nginx:
+    image: nginx:latest
+    container_name: autocaravaneando-nginx
+    volumes:
+      - ../../datos:/usr/share/nginx/html
+      - ../../logs:/var/log/nginx
+    ports:
+      - "80:80"
+    restart: always
